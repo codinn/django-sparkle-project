@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 import sparkle
 import os
 
@@ -7,6 +7,28 @@ def read(fname):
 
 README = read('README.md')
 
+def get_package_data(package):
+    """
+    Return all files under the root package, that are not in a
+    package themselves.
+    """
+    walk = [(dirpath.replace(package + os.sep, '', 1), filenames)
+            for dirpath, dirnames, filenames in os.walk(package)
+            if not os.path.exists(os.path.join(dirpath, '__init__.py'))]
+
+    filepaths = []
+    for base, filenames in walk:
+        filepaths.extend([os.path.join(base, filename)
+                          for filename in filenames])
+    return {package: filepaths}
+
+def get_packages(package):
+    """
+    Return root package and all sub-packages.
+    """
+    return [dirpath
+            for dirpath, dirnames, filenames in os.walk(package)
+if os.path.exists(os.path.join(dirpath, '__init__.py'))]
 
 setup(
     name = "django-sparkle-project",
@@ -18,7 +40,8 @@ setup(
     author_email = 'miikka.varri@gmail.com',
     license = 'BSD',
     zip_safe = False,
-    packages = find_packages(),
+    packages = get_packages('sparkle'),
+    package_data=get_package_data('sparkle'),
     include_package_data = True,
     classifiers = [
         'Environment :: Web Environment',
