@@ -99,7 +99,7 @@ class Version(models.Model):
 class SystemProfileReport(models.Model):
     """A system profile report"""
     
-    ip_address = models.IPAddressField()
+    ip_address = models.GenericIPAddressField()
     added = models.DateTimeField(auto_now_add=True)
     
     def __unicode__(self):
