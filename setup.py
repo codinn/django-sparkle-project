@@ -9,13 +9,13 @@ README = read('README.md')
 
 
 setup(
-    name = "django-sparkle",
+    name = "django-sparkle-project",
     version = sparkle.__version__,
-    description = 'Django-sparkle is a Django application to make it easy to publish updates for your mac application using sparkle',
+    description = 'Django-sparkle-project is a Django application to make it easy to publish updates for your mac application using sparkle',
     long_description = README,
-    url = 'http://github.com/Mobelux/django-sparkle',
-    author = 'Jason Emerick',
-    author_email = 'jemerick@gmail.com',
+    url = 'http://github.com/ruuti/django-sparkle-project',
+    author = 'Miikka Värri',
+    author_email = 'miikka.varri@gmail.com',
     license = 'BSD',
     zip_safe = False,
     packages = find_packages(),
