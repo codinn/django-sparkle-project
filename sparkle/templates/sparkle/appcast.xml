@@ -1,15 +1,15 @@
-{% load markup %}<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
     <channel>
         <title>{{ application.name }}</title>
-        <link>http://{{ site.domain }}{% url sparkle_application_appcast application.id %}</link>
+        <link>http://{{ site.domain }}{% url 'sparkle_application_appcast' application.id %}</link>
         <description>Most recent changes with links to updates.</description>
         <language>en</language>
         {% for version in versions %}
             <item>
                 <title>{{ version.title }}</title>
 			    <description><![CDATA[
-                    {{ version.release_notes|markdown }}
+                    {{ version.release_notes }}
                 ]]>
                 </description>
                 <pubDate>{{ version.published|date:"r" }}</pubDate>
