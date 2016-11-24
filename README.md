@@ -11,7 +11,7 @@ In addition to publishing updates via the appcast feed, Django-sparkle-project c
 
 ## Setup
 
-1. `pip install https://github.com/ruuti/django-sparkle-project`
+1. `pip install https://github.com/ruuti/django-sparkle-project/archive/master.zip`
 2. Add `sparkle` to your installed apps
 4. In `settings.py` add `SPARKLE_PRIVATE_KEY_PATH` which is the path to your private DSA key for signing your releases.
 5. In `urls.py` include the sparkle URLs by adding something like `(r'^sparkle/', include('sparkle.urls'))`.
