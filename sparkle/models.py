@@ -1,25 +1,22 @@
 import os
-import zipfile
-import tempfile
-import shutil
-import plistlib
 from django.db import models
-from django.conf import settings
 from sparkle.conf import SPARKLE_PRIVATE_KEY_PATH
+
 
 class Application(models.Model):
     """A sparkle application"""
-    
+
     name = models.CharField(max_length=50)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
+
 
 class Version(models.Model):
     """A version for a given application"""
-    
+
     application = models.ForeignKey(Application)
-    
+
     title = models.CharField(max_length=100)
     version = models.CharField(blank=True, null=True, max_length=10)
     short_version = models.CharField(blank=True, null=True, max_length=50)
@@ -31,11 +28,11 @@ class Version(models.Model):
     update = models.FileField()
     active = models.BooleanField(default=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
-        
+
     def save(self, *args, **kwargs):
-                
+
         # if there is no dsa signature and a private key is provided in the settings
         if not self.dsa_signature and SPARKLE_PRIVATE_KEY_PATH and os.path.exists(SPARKLE_PRIVATE_KEY_PATH):
             command = 'openssl dgst -sha1 -binary < "%s" | openssl dgst -dss1 -sign "%s" | openssl enc -base64' % (path, SPARKLE_PRIVATE_KEY_PATH)
@@ -44,27 +41,29 @@ class Version(models.Model):
             process.close()
 
         # Calculate file size
-        if not self.length :
+        if not self.length:
             # TODO: set correct size
             self.length = 0
 
         super(Version, self).save(*args, **kwargs)
 
+
 class SystemProfileReport(models.Model):
     """A system profile report"""
-    
+
     ip_address = models.GenericIPAddressField()
     added = models.DateTimeField(auto_now_add=True)
-    
-    def __unicode__(self):
-        return u'SystemProfileReport'
-    
+
+    def __str__(self):
+        return 'SystemProfileReport'
+
+
 class SystemProfileReportRecord(models.Model):
     """A key/value pair for a system profile report"""
-    
+
     report = models.ForeignKey(SystemProfileReport)
     key = models.CharField(max_length=100)
     value = models.CharField(max_length=80)
-    
-    def __unicode__(self):
-        return u'%s: %s' % (self.key, self.value)
+
+    def __str__(self):
+        return '%s: %s' % (self.key, self.value)
