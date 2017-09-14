@@ -67,16 +67,10 @@ class Version(models.Model):
                     else:
                         zip_file.extract(f, tempdir)
 
-                total_size = 0
-                for dirpath, dirnames, filenames in os.walk(start_path):
-                    for f in filenames:
-                        fp = os.path.join(dirpath, f)
-                        total_size += os.path.getsize(fp)
-
                 info_plist = os.path.join(start_path, 'Contents/Info.plist')
 
                 if os.path.exists(info_plist):
-                    plist = plistlib.readPlist(info_plist)
+                    plist = plistlib.load(info_plist)
 
                     if not self.version and 'CFBundleVersion' in plist:
                         self.version = plist.get('CFBundleVersion')
@@ -89,7 +83,7 @@ class Version(models.Model):
 
                 shutil.rmtree(tempdir)
 
-                self.length = total_size
+                self.length = os.path.getsize(path)
 
         super(Version, self).save(*args, **kwargs)
 
