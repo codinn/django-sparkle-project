@@ -70,7 +70,7 @@ class Version(models.Model):
                 info_plist = os.path.join(start_path, 'Contents/Info.plist')
 
                 if os.path.exists(info_plist):
-                    with open(info_plist) as f:
+                    with open(info_plist, 'rb') as f:
                         plist = plistlib.load(f)
 
                         if not self.version and 'CFBundleVersion' in plist:
