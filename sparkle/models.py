@@ -40,6 +40,8 @@ class Version(models.Model):
 
     def save(self, *args, **kwargs):
         path = os.path.join(settings.MEDIA_ROOT, self.update.path)
+        super(Version, self).save(*args, **kwargs)
+        update = False
 
         # if there is no dsa signature and a private key is provided in the settings
         if not self.dsa_signature and SPARKLE_PRIVATE_KEY_PATH and os.path.exists(SPARKLE_PRIVATE_KEY_PATH):
@@ -48,6 +50,7 @@ class Version(models.Model):
             process = os.popen(command)
             self.dsa_signature = process.readline().strip()
             process.close()
+            update = True
 
         # if there is no length and it is a zip file
         # extract it to a tempdir and calculate the length
@@ -86,7 +89,8 @@ class Version(models.Model):
 
                 self.length = os.path.getsize(path)
 
-        super(Version, self).save(*args, **kwargs)
+        if update:
+            super(Version, self).save(*args, **kwargs)
 
 
 class SystemProfileReport(models.Model):
