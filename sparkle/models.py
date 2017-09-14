@@ -70,16 +70,17 @@ class Version(models.Model):
                 info_plist = os.path.join(start_path, 'Contents/Info.plist')
 
                 if os.path.exists(info_plist):
-                    plist = plistlib.load(info_plist)
+                    with open(info_plist) as f:
+                        plist = plistlib.load(f)
 
-                    if not self.version and 'CFBundleVersion' in plist:
-                        self.version = plist.get('CFBundleVersion')
+                        if not self.version and 'CFBundleVersion' in plist:
+                            self.version = plist.get('CFBundleVersion')
 
-                    if not self.short_version and 'CFBundleShortVersionString' in plist:
-                        self.short_version = plist.get('CFBundleShortVersionString')
+                        if not self.short_version and 'CFBundleShortVersionString' in plist:
+                            self.short_version = plist.get('CFBundleShortVersionString')
 
-                    if not self.minimum_system_version and 'LSMinimumSystemVersion' in plist:
-                        self.minimum_system_version = plist.get('LSMinimumSystemVersion')
+                        if not self.minimum_system_version and 'LSMinimumSystemVersion' in plist:
+                            self.minimum_system_version = plist.get('LSMinimumSystemVersion')
 
                 shutil.rmtree(tempdir)
 
