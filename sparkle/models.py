@@ -40,12 +40,13 @@ class Version(models.Model):
 
     def save(self, *args, **kwargs):
         super(Version, self).save(*args, **kwargs)
+        path = self.update.path
         update = False
 
         # if there is no dsa signature and a private key is provided in the settings
         if not self.dsa_signature and SPARKLE_PRIVATE_KEY_PATH and os.path.exists(SPARKLE_PRIVATE_KEY_PATH):
             command = 'openssl dgst -sha1 -binary < "%s" | openssl dgst -dss1 -sign "%s" | openssl enc -base64' % (
-                self.update.path, SPARKLE_PRIVATE_KEY_PATH)
+                path, SPARKLE_PRIVATE_KEY_PATH)
             process = os.popen(command)
             self.dsa_signature = process.readline().strip()
             process.close()
@@ -55,38 +56,40 @@ class Version(models.Model):
         # extract it to a tempdir and calculate the length
         # also parse the plist file for versions
         if not self.length and path.endswith('.zip'):
-                zip_file = zipfile.ZipFile(path)
-                tempdir = tempfile.mkdtemp()
-                files = zip_file.namelist()
-                start_path = None
+            zip_file = zipfile.ZipFile(path)
+            tempdir = tempfile.mkdtemp()
+            files = zip_file.namelist()
+            start_path = None
 
-                for f in files:
-                    if f.endswith('/'):
-                        d = os.path.join(tempdir, f)
-                        if not start_path:
-                            start_path = d
-                            os.makedirs(d)
-                    else:
-                        zip_file.extract(f, tempdir)
+            for f in files:
+                if f.endswith('/'):
+                    d = os.path.join(tempdir, f)
+                    if not start_path:
+                        start_path = d
+                        os.makedirs(d)
+                else:
+                    zip_file.extract(f, tempdir)
 
-                info_plist = os.path.join(start_path, 'Contents/Info.plist')
+            info_plist = os.path.join(start_path, 'Contents/Info.plist')
 
-                if os.path.exists(info_plist):
-                    with open(info_plist, 'rb') as f:
-                        plist = plistlib.load(f)
+            if os.path.exists(info_plist):
+                with open(info_plist, 'rb') as f:
+                    plist = plistlib.load(f)
 
-                        if not self.version and 'CFBundleVersion' in plist:
-                            self.version = plist.get('CFBundleVersion')
+                    if not self.version and 'CFBundleVersion' in plist:
+                        self.version = plist.get('CFBundleVersion')
 
-                        if not self.short_version and 'CFBundleShortVersionString' in plist:
-                            self.short_version = plist.get('CFBundleShortVersionString')
+                    if not self.short_version and 'CFBundleShortVersionString' in plist:
+                        self.short_version = plist.get('CFBundleShortVersionString')
 
-                        if not self.minimum_system_version and 'LSMinimumSystemVersion' in plist:
-                            self.minimum_system_version = plist.get('LSMinimumSystemVersion')
+                    if not self.minimum_system_version and 'LSMinimumSystemVersion' in plist:
+                        self.minimum_system_version = plist.get('LSMinimumSystemVersion')
 
-                shutil.rmtree(tempdir)
+            shutil.rmtree(tempdir)
 
-                self.length = os.path.getsize(path)
+        if not self.length:
+            update = True
+            self.length = os.path.getsize(path)
 
         if update:
             super(Version, self).save(*args, **kwargs)
